@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<style type="text/css">
+		#console-log {
+			background-color: black;
+			color: white;
+			font-family: 'Consolas';
+			padding: 12px;
+		}
+	</style>
+</head>
+<body>
+
+	<button id="like-post">Likear!</button>
+
+	<p id="console-log"></p>
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.min.js"></script>
+
+	<script type="text/javascript">
+
+		// Defino el estado inicial del store
+		let initialState = {
+			posts : [],
+			users: []
+		}
+		 
+		// Inicializo el store (redux)
+		var redux = Redux.createStore(function (state = initialState, action) {
+			switch(action.type) {
+				case 'ADD_POST':
+					state.posts = state.posts.concat(action.post)
+				break;
+
+				case 'LIKE_POST':
+					state.posts.map(post => {
+						if (post.id === action.postId) {
+							return post.likes++
+						}
+
+						return post
+					})
+				break;
+			}
+
+			return state
+		})
+
+		// Creo un post de ejemplo
+		redux.dispatch({
+			type: 'ADD_POST', 
+			post: {id: 5, title: 'nuevo post', likes: 0}
+		})
+
+		// Likeo 3 veces el mismo post
+		redux.dispatch({type: 'LIKE_POST', postId: 5})
+		redux.dispatch({type: 'LIKE_POST', postId: 5})
+		redux.dispatch({type: 'LIKE_POST', postId: 5})
+
+		// Creo un listener para el boton de like
+		document
+			.getElementById('like-post')
+			.addEventListener('click', function () {
+				redux.dispatch({
+					type: 'LIKE_POST',
+					postId: 5
+				})
+			})
+
+		// Actualizo la vista cada vez que se likea nuevamente
+		redux.subscribe(function () {
+			let log = document.getElementById('console-log')
+
+			log.innerHTML = JSON.stringify(redux.getState().posts[0])
+		})
+
+	</script>
+
+</body>
+</html>
+
+
+
